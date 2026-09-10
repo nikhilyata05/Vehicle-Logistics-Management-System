@@ -40,6 +40,17 @@ This project was developed as a practical C++ application to understand and impl
 
 It focuses on modular programming, object-oriented concepts, data handling, file persistence, and management of vehicles and trips.
 
+## Screenshots
+
+### Main Menu
+![Main Menu](main-menu.png)
+
+### Vehicle Management
+![Vehicle Management](vehicle-management.png)
+
+### Booking and Trip Scheduling
+![Booking and Trip Scheduling](booking-trip-scheduling.png)
+
 ## Author
 
 **Y. Nikhil**
