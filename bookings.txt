@@ -1,0 +1,3 @@
+Booking ID: B002 | Vehicle: V004 | Customer: RamSingh | Route: Chennai -> Thiruvananthapuram
+Booking ID: B001 | Vehicle: V001 | Customer: Hari | Route: Hyderabad -> Mumbai
+Booking ID: B003 | Vehicle: V003 | Customer: jayakrishna reddy | Route: Raichur -> Mahabubnagar

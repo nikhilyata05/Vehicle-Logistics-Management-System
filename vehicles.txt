@@ -1,0 +1,5 @@
+V001|TG15KA1884|Large - 12/14 Tyre|15|Hyderabad|Available
+V002|AP09AF2151|Small - 3 Tyre|0.5|Machilipatnam|Available
+V003|KA11LM2221|Medium - 4/6 Tyre|6|Raichur|Available
+V004|TN51KP2521|Small - 3 Tyre|1|Chennai|Available
+V005|MH23QP7653|Large - 12/14 Tyre|20|Mumbai|Available
