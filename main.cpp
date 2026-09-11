@@ -306,10 +306,10 @@ int main()
                 cout << "\n";
                 cout << "========================================\n";
                 cout << "                TRIP MENU\n";
-                cout << "========================================\n";
                 cout << "  1. Schedule Trip\n";
-                cout << "  2. View Scheduled Trips\n";
-                cout << "  3. Back to Main Menu\n";
+                cout << "  2. View Trips\n";
+                cout << "  3. Mark Trip as Completed\n";
+                cout << "  4. Back to Main Menu\n";
                 cout << "========================================\n";
 
                 cout << "\nEnter Your Choice: ";
@@ -335,6 +335,10 @@ int main()
                     break;
 
                 case 3:
+                    manager.markTripAsCompleted();
+                    break;
+
+                case 4:
                     cout << "\nReturning to Main Menu...\n";
                     break;
 
@@ -342,7 +346,7 @@ int main()
                     cout << "\nInvalid Choice! Please try again.\n";
                 }
 
-            } while (tripChoice != 3);
+            } while (tripChoice != 4);
 
             break;
         }
