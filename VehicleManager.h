@@ -34,6 +34,91 @@ private:
 		return text;
 	}
 
+	// =========================================================
+// FORMAT DATE
+// =========================================================
+
+	string formatDate(string date)
+	{
+		// Remove spaces
+		date.erase(remove(date.begin(), date.end(), ' '), date.end());
+
+		// Convert / to -
+		for (int i = 0; i < date.length(); i++)
+		{
+			if (date[i] == '/')
+			{
+				date[i] = '-';
+			}
+		}
+
+		// Allow input such as 11092026
+		if (date.length() == 8)
+		{
+			bool valid = true;
+
+			for (int i = 0; i < date.length(); i++)
+			{
+				if (!isdigit(static_cast<unsigned char>(date[i])))
+				{
+					valid = false;
+					break;
+				}
+			}
+
+			if (valid)
+			{
+				date = date.substr(0, 2) + "-" +
+					date.substr(2, 2) + "-" +
+					date.substr(4, 4);
+			}
+		}
+
+		return date;
+	}
+
+
+	// =========================================================
+	// FORMAT TIME
+	// =========================================================
+
+	string formatTime(string time)
+	{
+		// Remove spaces
+		time.erase(remove(time.begin(), time.end(), ' '), time.end());
+
+		// Convert . to :
+		for (int i = 0; i < time.length(); i++)
+		{
+			if (time[i] == '.')
+			{
+				time[i] = ':';
+			}
+		}
+
+		// Allow input such as 1030
+		if (time.length() == 4)
+		{
+			bool valid = true;
+
+			for (int i = 0; i < time.length(); i++)
+			{
+				if (!isdigit(static_cast<unsigned char>(time[i])))
+				{
+					valid = false;
+					break;
+				}
+			}
+
+			if (valid)
+			{
+				time = time.substr(0, 2) + ":" +
+					time.substr(2, 2);
+			}
+		}
+
+		return time;
+	}
 
 public:
 
@@ -1872,6 +1957,235 @@ public:
 	// SCHEDULE TRIP
 	// =========================================================
 
+	// =========================================================
+// MARK TRIP AS COMPLETED
+// =========================================================
+
+	void markTripAsCompleted()
+	{
+		if (trips.empty())
+		{
+			cout << "\nNo trips available.\n";
+			return;
+		}
+
+		cout << "\n=================================================\n";
+		cout << "              ACTIVE TRIPS\n";
+		cout << "=================================================\n";
+
+		int activeCount = 0;
+
+		for (int i = 0; i < trips.size(); i++)
+		{
+			// Show only trips that are not completed
+			if (trips[i].find(" | Status: Completed") == string::npos)
+			{
+				activeCount++;
+
+				cout << "\n" << activeCount << ".\n";
+				cout << trips[i] << endl;
+				cout << "-------------------------------------------------\n";
+			}
+		}
+
+		cout << "=================================================\n";
+
+		if (activeCount == 0)
+		{
+			cout << "\nNo active trips are available to complete.\n";
+			return;
+		}
+
+		int choice;
+
+		cout << "\nSelect Trip to Mark as Completed: ";
+		cin >> choice;
+
+		if (cin.fail())
+		{
+			cin.clear();
+			cin.ignore(1000, '\n');
+
+			cout << "\nInvalid input! Please enter a number.\n";
+			return;
+		}
+
+		if (choice < 1 || choice > activeCount)
+		{
+			cout << "\nInvalid trip choice.\n";
+			return;
+		}
+
+		int currentChoice = 0;
+
+		for (int i = 0; i < trips.size(); i++)
+		{
+			if (trips[i].find(" | Status: Completed") == string::npos)
+			{
+				currentChoice++;
+
+				if (currentChoice == choice)
+				{
+					string selectedTrip = trips[i];
+
+					// =================================================
+					// GET VEHICLE ID
+					// =================================================
+
+					string vehicleStart = "| Vehicle: ";
+					int vehiclePosition =
+						selectedTrip.find(vehicleStart);
+
+					if (vehiclePosition == string::npos)
+					{
+						cout << "\nError: Vehicle information not found in trip.\n";
+						return;
+					}
+
+					vehiclePosition += vehicleStart.length();
+
+					int vehicleEnd =
+						selectedTrip.find(" |", vehiclePosition);
+
+					if (vehicleEnd == string::npos)
+					{
+						cout << "\nError: Vehicle information is invalid.\n";
+						return;
+					}
+
+					string vehicleId =
+						selectedTrip.substr(
+							vehiclePosition,
+							vehicleEnd - vehiclePosition);
+
+
+					// =================================================
+					// GET DESTINATION CITY
+					// =================================================
+
+					string routeStart = " | Route: ";
+
+					int routePosition =
+						selectedTrip.find(routeStart);
+
+					if (routePosition == string::npos)
+					{
+						cout << "\nError: Route information not found in trip.\n";
+						return;
+					}
+
+					routePosition += routeStart.length();
+
+					int routeEnd =
+						selectedTrip.find(" | Date:", routePosition);
+
+					if (routeEnd == string::npos)
+					{
+						cout << "\nError: Route information is invalid.\n";
+						return;
+					}
+
+					string route =
+						selectedTrip.substr(
+							routePosition,
+							routeEnd - routePosition);
+
+					// Find destination after ->
+					int arrowPosition =
+						route.find(" -> ");
+
+					if (arrowPosition == string::npos)
+					{
+						cout << "\nError: Destination city could not be identified.\n";
+						return;
+					}
+
+					string destination =
+						route.substr(
+							arrowPosition + 4);
+
+
+					// =================================================
+					// FIND VEHICLE
+					// =================================================
+
+					bool vehicleFound = false;
+
+					for (int j = 0; j < vehicles.size(); j++)
+					{
+						if (vehicles[j].getVehicleId() == vehicleId)
+						{
+							vehicleFound = true;
+
+							// -----------------------------------------
+							// UPDATE CURRENT CITY
+							// -----------------------------------------
+
+							vehicles[j].setcurrentCity(destination);
+
+							// -----------------------------------------
+							// UPDATE VEHICLE STATUS
+							// -----------------------------------------
+
+							vehicles[j].setvehicleStatus("Available");
+
+							saveVehicles();
+
+							break;
+						}
+					}
+
+					if (!vehicleFound)
+					{
+						cout << "\nError: Vehicle associated with this trip was not found.\n";
+						return;
+					}
+
+
+					// =================================================
+					// UPDATE TRIP STATUS
+					// =================================================
+
+					trips[i] =
+						selectedTrip + " | Status: Completed";
+
+					saveTrips();
+
+
+					// =================================================
+					// SUCCESS MESSAGE
+					// =================================================
+
+					cout << "\n=================================================\n";
+					cout << "             TRIP COMPLETED SUCCESSFULLY\n";
+					cout << "=================================================\n";
+
+					cout << "Trip ID              : "
+						<< getTripId(selectedTrip) << endl;
+
+					cout << "Vehicle ID           : "
+						<< vehicleId << endl;
+
+					cout << "Destination City     : "
+						<< destination << endl;
+
+					cout << "Trip Status          : Completed" << endl;
+
+					cout << "Vehicle Current City : "
+						<< destination << endl;
+
+					cout << "Vehicle Status       : Available" << endl;
+
+					cout << "=================================================\n";
+
+					return;
+				}
+			}
+		}
+
+		cout << "\nUnable to complete the selected trip.\n";
+	}
+
 	void scheduleTrip()
 	{
 		if (bookings.empty())
@@ -2014,14 +2328,29 @@ public:
 		cout << "\nEnter Date (DD-MM-YYYY): ";
 		cin >> date;
 
+		date = formatDate(date);
+
+		cout << "Formatted Date: "
+			<< date << endl;
+
 		cout << "\nEnter Time (HH:MM): ";
 		cin >> time;
+
+		time = formatTime(time);
+
+		cout << "Formatted Time: "
+			<< time << endl;
+
+		// Format Date and Time automatically
+		date = formatDate(date);
+		time = formatTime(time);
 
 		string trip =
 			"Trip ID: " + tripId +
 			" | Booking: " + selectedBooking +
 			" | Date: " + date +
-			" | Time: " + time;
+			" | Time: " + time +
+			" | Status: Scheduled";
 
 		trips.push_back(trip);
 
@@ -2047,24 +2376,26 @@ public:
 
 
 	// =========================================================
-	// VIEW TRIPS
-	// =========================================================
+// VIEW TRIPS
+// =========================================================
 
 	void viewTrips()
 	{
 		if (trips.empty())
 		{
-			cout << "\nNo Trips Scheduled.\n";
+			cout << "\nNo Trips Available.\n";
 
 			return;
 		}
 
-		cout << "\n================ SCHEDULED TRIPS ================\n";
+		cout << "\n================ ALL TRIPS ================\n";
 
 		for (int i = 0; i < trips.size(); i++)
 		{
-			cout << i + 1 << ". "
+			cout << "\n" << i + 1 << ". "
 				<< trips[i] << endl;
+
+			cout << "---------------------------------------------\n";
 		}
 	}
 
@@ -2946,8 +3277,8 @@ public:
 
 
 	// =========================================================
-	// CHECK VEHICLE ON TRIP
-	// =========================================================
+// CHECK VEHICLE ON TRIP
+// =========================================================
 
 	bool isVehicleOnTrip(string vehicleId)
 	{
@@ -2956,6 +3287,13 @@ public:
 
 		for (int i = 0; i < trips.size(); i++)
 		{
+			// Ignore completed trips
+			if (trips[i].find(" | Status: Completed")
+				!= string::npos)
+			{
+				continue;
+			}
+
 			if (trips[i].find(searchText)
 				!= string::npos)
 			{
